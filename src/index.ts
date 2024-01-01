@@ -1,6 +1,6 @@
-import { server as WebSocketServer } from "websocket";
+import { server as WebSocketServer, connection } from "websocket";
 import http from "http";
-import { SupportedMessage } from "./messages";
+import { IncomingMessage, SupportedMessage } from "./messages";
 
 const server = http.createServer(function (request: any, response: any) {
   console.log(new Date() + " Received request for " + request.url);
@@ -40,17 +40,13 @@ wsServer.on("request", function (request) {
   console.log(new Date() + " Connection accepted.");
   connection.on("message", function (message) {
     if (message.type === "utf8") {
-
       try {
-        messageHandler(JSON.parse(message.utf8Data))
-      } catch (error) {
-        
-      }
-
+        messageHandler(connection, JSON.parse(message.utf8Data));
+      } catch (error) {}
 
       // console.log("Received Message: " + message.utf8Data);
       // connection.sendUTF(message.utf8Data);
-    } 
+    }
   });
   connection.on("close", function (reasonCode, description) {
     console.log(
@@ -59,4 +55,8 @@ wsServer.on("request", function (request) {
   });
 });
 
-function messageHandler()
+function messageHandler(ws: connection, message: IncomingMessage) {
+  if (message.type == SupportedMessage.JoinRoom) {
+    const payload = message.payload;
+  }
+}
